@@ -50,11 +50,11 @@ echo "The reference genome to be used for bowtie2 is $GENOME"
 
 # Determine which bt2 directory to use:
 if [ $GENOME == "mm39" ]; then
-   BT2DIR="/stopgap/databank/igenomes/Mus_musculus/UCSC/mm39/Sequence/Bowtie2Index"
+   BT2DIR="/t1-data/databank/igenomes/Mus_musculus/UCSC/mm39/Sequence/Bowtie2Index"
 elif [ $GENOME == "mm39-R2" ]; then 
-   BT2DIR="/stopgap/fgenomics/egeorgia/custom-genome/Bowtie2Index"
+   BT2DIR="/t1-data/project/fgenomics/egeorgia/Data/Bowtie2/Bowtie2_mm39-AL2R2chrX"
 elif [ $GENOME == "hg38" ]; then
-   BT2DIR="/stopgap/databank/igenomes/Homo_sapiens/UCSC/hg38/Sequence/Bowtie2Index"
+   BT2DIR="/t1-data/databank/igenomes/Homo_sapiens/UCSC/hg38/Sequence/Bowtie2Index"
 else
   echo "Incorrect genome entered, choose either mm39, mm39-R2 or hg38."
 fi
