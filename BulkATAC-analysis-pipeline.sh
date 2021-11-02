@@ -92,7 +92,7 @@ samtools view -c -f 3 ${SAMPLE}.bam
 echo ""
 echo "QC#3: Filtering the number of reads which are paired and mapped in proper pair: "
 if ! samtools view -b -h -f 3 ${SAMPLE}.bam > ${SAMPLE}_properpairs.bam ; then
-    echo Samtools returned an error
+    echo "Samtools returned an error"
     exit 1
 fi
 echo ""
@@ -106,7 +106,7 @@ if ! samtools view -bShuF 4 -f 2 -q 30 ${SAMPLE}_properpairs.bam > ${SAMPLE}_pro
 echo ""
 echo "Sorting the bam file ..."
 if ! samtools sort -o ${SAMPLE}_properpairs_q30_sorted.bam ${SAMPLE}_properpairs_q30.bam ; then
-    echo Samtools returned a sorting error
+    echo "Samtools returned a sorting error"
     exit 1
 fi
 
@@ -114,7 +114,7 @@ fi
 echo ""
 echo "Remove potential PCR duplicates: if multiple read pairs have identical external coordinates, only retain the pair with highest mapping quality."
 if ! samtools rmdup ${SAMPLE}_properpairs_q30_sorted.bam ${SAMPLE}_properpairs_q30_sorted_rmdup.bam ; then
-    echo samtools rmdup returned an error
+    echo "samtools rmdup returned an error"
     exit 1
 fi
 
@@ -122,7 +122,7 @@ fi
 echo ""
 echo "Indexing the bam file ..."
 if ! samtools index ${SAMPLE}_properpairs_q30_sorted_rmdup.bam ; then
-    echo Samtools returned an index error
+    echo "Samtools returned an index error"
     exit 1
 fi
 
