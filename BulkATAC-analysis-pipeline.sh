@@ -17,6 +17,8 @@ while getopts ":f:d:r:g:n:p:" arg; do
 	SAMPLE=${OPTARG};;
     d) # Specify directory containing gun-zipped fastqs.
        DATA=${OPTARG};;
+    r) # Specify whether reads are single or paired-end.
+       READS=${OPTARG};;
     g) # Specify genome build (mm39, mm39-R2 or hg38).
 	GENOME=${OPTARG};;
     n) # Specify bowtie2 prefix (i.e. xxx.1.bt2)
@@ -67,11 +69,24 @@ echo "Necessary tools has been loading..."
 module load bowtie2 samtools deeptools
 echo ""
 
-# Step 1: Align single ot paired end reads using Bowtie2
+# Step 1: Align single or paired end reads using Bowtie2
 echo "Performing bowtie2 ..."
-if ! bowtie2 -q -N 1 -X 2000 -p 8 -x ${BT2DIR}/${BT2PREFIX} -1 ${DATA}/${SAMPLE}_R1.fastq.gz -2 ${DATA}/${SAMPLE}_R2.fastq.gz -S ${SAMPLE}.sam ; then
-    echo "Bowtie returned an error"
-    exit 1
+
+if [ $READS == "single" ]; then
+    echo "Processing single-end reads"
+    if ! bowtie2 -q -N 1 -X 2000 -p 8 -x ${BT2DIR}/${BT2PREFIX} -U ${DATA}/${SAMPLE}.fastq.gz -S ${SAMPLE}.sam ; then
+       echo "Bowtie returned an error"
+       exit 1
+    fi
+elif [ $READS == "paired" ]; then
+    echo "Processing paired-end reads" 
+    if ! bowtie2 -q -N 1 -X 2000 -p 8 -x ${BT2DIR}/${BT2PREFIX} -1 ${DATA}/${SAMPLE}_R1.fastq.gz -2 ${DATA}/${SAMPLE}_R2.fastq.gz -S ${SAMPLE}.sam ; then
+       echo "Bowtie returned an error"
+       exit 1
+    fi
+else
+    echo "Must specify whether reads are single or paired-end"
+
 fi
 
 # Step 2: Sam to Bam conversion
