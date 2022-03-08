@@ -72,12 +72,14 @@ echo ""
 # Step 1: Align single or paired end reads using Bowtie2
 echo "Performing bowtie2 ..."
 
+# SINGLE-END:
 if [ $READS == "single" ]; then
     echo "Processing single-end reads"
     if ! bowtie2 -q -N 1 -X 2000 -p 8 -x ${BT2DIR}/${BT2PREFIX} -U ${DATA}/${SAMPLE}.fastq.gz -S ${SAMPLE}.sam ; then
        echo "Bowtie returned an error"
        exit 1
     fi
+# PAIRED-END:
 elif [ $READS == "paired" ]; then
     echo "Processing paired-end reads" 
     if ! bowtie2 -q -N 1 -X 2000 -p 8 -x ${BT2DIR}/${BT2PREFIX} -1 ${DATA}/${SAMPLE}_R1.fastq.gz -2 ${DATA}/${SAMPLE}_R2.fastq.gz -S ${SAMPLE}.sam ; then
@@ -97,26 +99,19 @@ if ! samtools view -b -o ${SAMPLE}.bam ${SAMPLE}.sam ; then
     exit 1
 fi
 
-# Step 3: QC step - removing reads with low mapping quality
-echo ""
-echo "Reads with mapping quality less than 30 are removed"
-if ! samtools view -bShuF 4 -f 2 -q 30 ${SAMPLE}.bam > ${SAMPLE}_q30.bam ; then
-    echo "samtools filtering returned an error"
-    exit 1
-    fi
-
 # Step 3: sort bamfile by genomic coordinate
 echo ""
 echo "Sorting the bam file ..."
-if ! samtools sort -o ${SAMPLE}_q30_sorted.bam ${SAMPLE}_q30.bam ; then
+if ! samtools sort -o ${SAMPLE}_sorted.bam ${SAMPLE}.bam ; then
     echo "Samtools returned a sorting error"
     exit 1
 fi
 
 # Step 4: remove duplicates
 echo ""
-echo "Remove potential PCR duplicates: if multiple read pairs have identical external coordinates, only retain the pair with highest mapping quality."
-if ! samtools rmdup ${SAMPLE}_q30_sorted.bam ${SAMPLE}_q30_sorted_rmdup.bam ; then
+echo "Remove potential PCR duplicates: if multiple read pairs have identical external coordinates," 
+echo "only retain the pair with highest mapping quality."
+if ! samtools rmdup ${SAMPLE}_sorted.bam ${SAMPLE}_sorted_rmdup.bam ; then
     echo "samtools rmdup returned an error"
     exit 1
 fi
@@ -124,27 +119,16 @@ fi
 # Step 5: index bam
 echo ""
 echo "Indexing the bam file ..."
-if ! samtools index ${SAMPLE}_q30_sorted_rmdup.bam ; then
+if ! samtools index ${SAMPLE}_sorted_rmdup.bam ; then
     echo "Samtools returned an index error"
     exit 1
 fi
-
-# Calculating summary statistics...
 echo ""
-echo "Calculating and printing statistics to stdout ..."
-samtools flagstat ${SAMPLE}_q30_sorted_rmdup.bam > ${SAMPLE}.properpairs.rmdup.flagstat.txt
 
-echo ""
-echo "Continuing with sorted and indexed bam file i.e. alignment_sorted_mapped.bam"
-
-
-# echo ""
-# echo "Deleting intermediate files..."
-# rm -rf ${SAMPLE}.sam ${OUTPUT_PREFIX}.bam ${OUTPUT_PREFIX}_q30.bam ${OUTPUT_PREFIX}_q30_sorted.bam
 
 # Creating a bigwig using DeepTools
 echo "Creating bigwig"
-bamCoverage -b ${SAMPLE}_q30_sorted_rmdup.bam -o ${SAMPLE}.bw -bs 1 --extendReads
+bamCoverage -b ${SAMPLE}_sorted_rmdup.bam -o ${SAMPLE}.bw
 
 # Copying bigwigs to datashare folder to view on ucsc genome browser
 cp ${SAMPLE}.bw /datashare/${public_dir}
