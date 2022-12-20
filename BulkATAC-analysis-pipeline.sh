@@ -5,7 +5,7 @@ usage() { echo -e "
 +-------------------------------------------------------+
 |                   ATAC-seq Analysis                   |
 |          Fastq -> bigwigs for ATAC-seq data           |
-|       Modified from Ravza's bulk ATAC analysis        |
+|       Modified from Ravza Gür's bulk ATAC analysis        |
 |              Emily Georgiades, Sep 2021               |
 +-------------------------------------------------------+
 Notes: sample name should be consistent with fastq naming.\n
@@ -52,11 +52,11 @@ echo "The reference genome to be used for bowtie2 is $GENOME"
 
 # Determine which bt2 directory to use:
 if [ $GENOME == "mm39" ]; then
-   BT2DIR="/t1-data/databank/igenomes/Mus_musculus/UCSC/mm39/Sequence/Bowtie2Index"
+   BT2DIR="<path>/Bowtie2Index"
 elif [ $GENOME == "mm39-R2" ]; then 
-   BT2DIR="/t1-data/project/fgenomics/egeorgia/Data/Bowtie2/Bowtie2_mm39-AL2R2chrX"
+   BT2DIR="<path>/Bowtie2_mm39-AL2R2chrX"
 elif [ $GENOME == "hg38" ]; then
-   BT2DIR="/t1-data/databank/igenomes/Homo_sapiens/UCSC/hg38/Sequence/Bowtie2Index"
+   BT2DIR="<path>/Bowtie2Index"
 else
   echo "Incorrect genome entered, choose either mm39, mm39-R2 or hg38."
 fi
@@ -134,7 +134,7 @@ bamCoverage -b ${SAMPLE}_sorted_rmdup.bam -o ${SAMPLE}.bw
 cp ${SAMPLE}.bw /datashare/${public_dir}
 echo ""
 echo "Copy + paste link into UCSC genome browser:"
-echo "bigDataUrl=http://sara.molbiol.ox.ac.uk/public/${public_dir}/${SAMPLE}.bw"
+echo "bigDataUrl=http://<path>/public/${public_dir}/${SAMPLE}.bw"
 echo ""
 
 end="$(date)"
